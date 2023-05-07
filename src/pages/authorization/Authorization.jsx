@@ -6,10 +6,6 @@ import Signin from "./Signin";
 
 function Authorization() {
   const [toggle, setToggle] = useState(false);
-  useEffect(() => {
-    console.log(toggle);
-  }, [toggle]);
-
   return (
     <>
     {toggle ? (

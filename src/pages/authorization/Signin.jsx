@@ -11,7 +11,7 @@ function Signin({ setToggle }) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const formValues = Object.fromEntries(formData.entries());
-    console.log('formValues', formValues);
+    // console.log('formValues', formValues);
     handleLogin(formValues)
   }
 

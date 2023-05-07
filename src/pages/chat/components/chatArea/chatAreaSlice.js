@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import _ from 'lodash';
 
 export const getChatHistory = createAsyncThunk(
     // name of action
@@ -10,7 +11,7 @@ export const getChatHistory = createAsyncThunk(
                 user_id: 1,
                 friend_id,
             });
-            console.log('getChatHistory response...', res.data);
+            // console.log('getChatHistory response...', res.data);
             return res.data;
         } catch (error) {
             return thunkAPI.rejectWithValue({ error: error.message })
@@ -24,14 +25,18 @@ export const chatAreaSlice = createSlice({
         status: 'idle',
         error: ""
     },
-    reducers: {},
+    reducers: {
+        // addMsgToMessageList: (state, action)=>{
+        //     state.data = [..._.cloneDeep(state.data), action.payload];
+        // }
+    },
     extraReducers: {
         [getChatHistory.pending]: (state, action) => {
             state.status = 'loading';
         },
         [getChatHistory.fulfilled]: (state, action) => {
             state.status = 'successful';
-            console.log('chatArea.action.payload', action.payload);
+            // console.log('chatArea.action.payload', action.payload);
             state.data = action.payload || [];
         },
         [getChatHistory.rejected]: (state, action) => {
@@ -41,6 +46,8 @@ export const chatAreaSlice = createSlice({
 })
 
 export default chatAreaSlice;
+
+// export const { addMsgToMessageList } = chatAreaSlice.actions;
 
 
 

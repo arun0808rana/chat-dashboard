@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import Wrapper from "./MessageList.style";
+import Wrapper from "./FriendList.style";
 import DPIcon from "../../../../assets/photo-1517841905240-472988babdf9.avif";
 import ProfilePic from "../../../../assets/dp.png";
 import CameraIcon from "../../../../assets/bi_camera.svg";
 import SearchIcon from "../../../../assets/akar-icons_search.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserList, setCurrentFriend } from "./messageListSlice";
+import { getUserList, setCurrentFriend } from "./friendListSlice";
 import { formatDate, toTitleCase } from "../../../../utils";
 
-function MessageList() {
+function FriendList() {
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getUserList());
   }, []);
 
-  const userList = useSelector((state) => state.messageList.userList);
+  const userList = useSelector((state) => state.friendList.userList);
 
   const [isOnline, setIsOnline] = useState("Online");
 
@@ -109,4 +109,4 @@ function MessageList() {
   );
 }
 
-export default MessageList;
+export default FriendList;

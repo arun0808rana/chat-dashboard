@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Wrapper from "./ChatArea.style";
+import Wrapper, { PlaceholderWrapper } from "./ChatArea.style";
 import TypingIndicator from "../../../../assets/typing_indiacator.gif";
 import SendIcon from "../../../../assets/send.svg";
 import EmojiIcon from "../../../../assets/emoji.svg";
@@ -16,9 +16,13 @@ import { socket } from "../../../../socket";
 function ChatArea() {
   const dispatch = useDispatch();
   const msgRef = useRef();
+  const msgContainerRef = useRef();
+
   const { id: user_id, name: user_name } = useSelector(state => state.authorization.data);
-  const { id: friend_id, username: friend_username } = useSelector(state => state.messageList.currentFriend);
+  const { id: friend_id, username: friend_username } = useSelector(state => state.friendList.currentFriend);
   const { data: messagesList, status, error } = useSelector(state => state.chatArea);
+
+  
 
   useEffect(() => {
     if (!friend_id && !user_id) {
@@ -27,91 +31,130 @@ function ChatArea() {
     dispatch(getChatHistory(friend_id));
   }, [friend_id]);
 
-  const sendMessage = () => {
-    console.log('msgRef', msgRef.current.value);
+  useEffect(() => {
+    console.log(messagesList, 'messagesList');
+    if (msgContainerRef.current) {
+      const scrollHeight = msgContainerRef.current.scrollHeight;
+      msgContainerRef.current.scrollTo({
+        top: scrollHeight,
+      });
+    }
+  }, [messagesList])
+  
+
+  const sendMessage = (event) => {
+    if (event.type === 'keydown' && event.key !== 'Enter') {
+      return;
+    }
+
+    // console.log('msgRef', msgRef.current.value);
+
     socket.emit('private message', {
       from: user_name,
       to: friend_username,
       message: msgRef.current.value,
     })
+  
+    // refectch messageList after sending each msg
+    dispatch(getChatHistory(friend_id));
+
     msgRef.current.value = '';
+
+    if (msgContainerRef.current) {
+      // console.log('Scrolling into view');
+      const scrollHeight = msgContainerRef.current.scrollHeight;
+      // console.log('scrollHeight', scrollHeight);
+      msgContainerRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+        inline: 'nearest'
+      });
+    }
   }
 
   return (
-    <Wrapper>
-      <div className="chat-area-heading">
-        <div className="chat-area-heading-lhs">{toTitleCase(friend_username)}</div>
-        <div className="chat-area-heading-rhs">
-          {/* <button className="chat-area-heading-btn active">Messages</button>
-          <button className="chat-area-heading-btn">Participants</button> */}
-          <img
-            src={CallIcon}
-            alt="audio call icon"
-            className="chat-area-heading-rhs-icon"
-          />
-          <img
-            src={VideoIcon}
-            alt="video call icon"
-            className="chat-area-heading-rhs-icon"
-          />
-          <img
-            src={SearchIcon}
-            alt="search icon"
-            className="chat-area-heading-rhs-icon"
-          />
-        </div>
-      </div>
+    <>
       {
-        (status === 'successful' && !error) ? <div className="chat-area-body">
-          <div className="chat-area-body-messages">
-            {messagesList.map((msg, index) => {
-              return (
-                <div className="chat-strip" key={`chat-strip-${msg.id}`}>
-                  {msg.sender_id !== Number(user_id) ? (
-                    <div className="chat-strip-dp">
-                      <img src={DPIcon} alt="" />
-                    </div>
-                  ) : null}
+        friend_id ?
+          <Wrapper>
+            <div className="chat-area-heading">
+              <div className="chat-area-heading-lhs">{toTitleCase(friend_username)}</div>
+              <div className="chat-area-heading-rhs">
+                {/* <button className="chat-area-heading-btn active">Messages</button>
+            <button className="chat-area-heading-btn">Participants</button> */}
+                <img
+                  src={CallIcon}
+                  alt="audio call icon"
+                  className="chat-area-heading-rhs-icon"
+                />
+                <img
+                  src={VideoIcon}
+                  alt="video call icon"
+                  className="chat-area-heading-rhs-icon"
+                />
+                <img
+                  src={SearchIcon}
+                  alt="search icon"
+                  className="chat-area-heading-rhs-icon"
+                />
+              </div>
+            </div>
+            {
+              (status === 'successful' && !error) ? <div className="chat-area-body">
+                <div className="chat-area-body-messages" ref={msgContainerRef} data-type="msg-container">
+                  {messagesList.map((msg, index) => {
+                    return (
+                      <div className="chat-strip" key={`chat-strip-${msg.id}`}>
+                        {msg.sender_id !== Number(user_id) ? (
+                          <div className="chat-strip-dp">
+                            <img src={DPIcon} alt="" />
+                          </div>
+                        ) : null}
 
-                  <div className={"chat-msg " + (msg.sender_id === Number(user_id) ? "right" : "left")}>
-                    <div className="chat-msg-time">
-                      {msg.sender_id === Number(user_id) ? "You, " : null}
-                      {formatDate(msg.created_at)}
-                    </div>
-                    <div
-                      className={"main-msg " + (msg.sender_id === Number(user_id) ? "right" : "left")}
-                    >
-                      {msg.content}
-                    </div>
+                        <div className={"chat-msg " + (msg.sender_id === Number(user_id) ? "right" : "left")}>
+                          <div className="chat-msg-time">
+                            {msg.sender_id === Number(user_id) ? "You, " : null}
+                            {formatDate(msg.created_at)}
+                          </div>
+                          <div
+                            className={"main-msg " + (msg.sender_id === Number(user_id) ? "right" : "left")}
+                          >
+                            {msg.content}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="typing-indication">
+                    <img src={TypingIndicator} alt="" />
+                    {friend_username} is typing...
                   </div>
                 </div>
-              );
-            })}
-            <div className="typing-indication">
-              <img src={TypingIndicator} alt="" />
-              {friend_username} is typing...
-            </div>
-          </div>
-          <div className="chat-area-body-typing-box">
-            <input
-              ref={msgRef}
-              type="text"
-              placeholder="Write your message..."
-              className="chat-area-body-typing-box-input"
-            />
-            <div className="chat-area-body-typing-box-input-icons" onClick={sendMessage}>
-              <img src={EmojiIcon} alt="emoji icon" />
-              <img src={AttachmentIcon} alt="attachement icon" />
-              <img
-                src={SendIcon}
-                alt="send icon"
-                className="chat-area-body-typing-box-input-icons-send-btn"
-              />
-            </div>
-          </div>
-        </div> : 'Loading...'
+                <div className="chat-area-body-typing-box">
+                  <input
+                    ref={msgRef}
+                    type="text"
+                    placeholder="Write your message..."
+                    className="chat-area-body-typing-box-input"
+                    onKeyDown={sendMessage}
+                  />
+                  <div className="chat-area-body-typing-box-input-icons" onClick={sendMessage}>
+                    <img src={EmojiIcon} alt="emoji icon" />
+                    <img src={AttachmentIcon} alt="attachement icon" />
+                    <img
+                      src={SendIcon}
+                      alt="send icon"
+                      className="chat-area-body-typing-box-input-icons-send-btn"
+                    />
+                  </div>
+                </div>
+              </div> : 'Loading...'
+            }
+          </Wrapper>
+          :
+          <PlaceholderWrapper />
       }
-    </Wrapper>
+    </>
   );
 }
 

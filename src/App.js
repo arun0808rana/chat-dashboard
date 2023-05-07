@@ -15,7 +15,7 @@ function App() {
   const {isUserAuthenticated} = useSelector(state=>state.authorization)
   useEffect(() => {
     function onConnect() {
-      console.log('User connected');
+      // console.log('User connected');
     }
 
     function onDisconnect() {

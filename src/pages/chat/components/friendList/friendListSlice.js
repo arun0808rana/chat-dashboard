@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const getUserList = createAsyncThunk(
     // name of action
-    'messageList/getUserList',
+    'friendList/getUserList',
     async (thunkAPI) => {
         try {
             const res = await axios.post('http://localhost:5000/getUserChatsList', {
@@ -15,8 +15,8 @@ export const getUserList = createAsyncThunk(
         }
     })
 
-export const messageListSlice = createSlice({
-    name: 'messageList',
+export const friendListSlice = createSlice({
+    name: 'friendList',
     initialState: {
         userList: [],
         status: 'idle',
@@ -38,7 +38,7 @@ export const messageListSlice = createSlice({
         },
         [getUserList.fulfilled]: (state, action) => {
             state.status = 'successful';
-            console.log('action.payload', action.payload);
+            // console.log('action.payload', action.payload);
             state.userList = action.payload;
         },
         [getUserList.rejected]: (state, action) => {
@@ -47,7 +47,7 @@ export const messageListSlice = createSlice({
     }
 })
 
-export default messageListSlice;
+export default friendListSlice;
 
-export const { setCurrentFriend } = messageListSlice.actions;
+export const { setCurrentFriend } = friendListSlice.actions;
 

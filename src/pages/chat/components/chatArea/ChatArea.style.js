@@ -1,5 +1,12 @@
 import styled from "styled-components/macro";
 
+export const PlaceholderWrapper = styled.div`
+  width: 100%;
+  background-color: #edf0f5;
+  border-radius: 10px;
+  height: 100%;
+`;
+
 const Wrapper = styled.div`
   width: 500px;
   background-color: #edf0f5;
@@ -162,5 +169,7 @@ const Wrapper = styled.div`
     }
   }
 `;
+
+
 
 export default Wrapper;

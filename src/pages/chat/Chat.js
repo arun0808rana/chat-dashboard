@@ -1,12 +1,12 @@
 import React from "react";
 import Wrapper from "./Chat.style";
 import ChatArea from "./components/chatArea/ChatArea";
-import MessageList from './components/messageList/MessageList';
+import FriendList from './components/friendList/FriendList';
 import ChatMisc from './components/chatMisc/ChatMisc';
 
 function Chat() {
   return <Wrapper>
-      <MessageList/>
+      <FriendList/>
       <ChatArea/>
       <ChatMisc/>
   </Wrapper>;

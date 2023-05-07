@@ -39,7 +39,7 @@ export const authorizationSlice = createSlice({
             if (token) {
                 localStorage.setItem('token', token);
             }
-            console.log('state.authorization', {...state});
+            // console.log('state.authorization', {...state});
             // Send the token to the server
             socket.auth = { token };
             socket.connect();
